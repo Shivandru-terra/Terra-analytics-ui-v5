@@ -1,6 +1,5 @@
 import { formatISTTime } from "@/lib/utils";
 import { generalFunctions } from "@/lib/generalFuntion";
-import { mainConfig } from "@/lib/mainConfig";
 import {
   createContext,
   ReactNode,
@@ -12,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { useSocketHandle } from "./useSocketHandle";
 import { v4 as uuidv4 } from "uuid";
+import { useMessages } from "@/hooks/use-threads";
 
 // --- Context ---
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -21,12 +21,20 @@ interface SocketProviderProps {
   children: ReactNode;
 }
 
-const SOCKET_URL = mainConfig.BASE_URL;
+const SOCKET_URL = generalFunctions.baseUrl;
 
 export const SocketProvider = ({ children }: SocketProviderProps) => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const pathParts = location.pathname.split("/");
+    const newThreadId = pathParts[2] || null;
+    setThreadId(newThreadId);
+    console.log("🔄 Updated threadId:", newThreadId);
+  }, [location.pathname]);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [threadId, setThreadId] = useState<string | null>(null);
-  const location = useLocation();
   const [status, setStatus] = useState<ServerStatus>({
     status: "initializing",
   });
@@ -38,13 +46,11 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
   const userId = generalFunctions.getUserId();
   const socket = useSocketHandle(userId, threadId, platform, SOCKET_URL);
   const [isLoading, setIsLoading] = useState(false);
+  const { data: threadMessages } = useMessages(threadId);
 
-  useEffect(() => {
-    const pathParts = location.pathname.split("/");
-    const newThreadId = pathParts[2] || null;
-    setThreadId(newThreadId);
-    console.log("🔄 Updated threadId:", newThreadId);
-  }, [location.pathname]);
+  console.log("threadMessages from react query", threadMessages);
+
+  
 
   useEffect(() => {
     if (!socket) return;
@@ -279,22 +285,8 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
   };
 
   useEffect(() => {
-    if (!threadId) return;
-    setMessages([]);
-    const fetchMessages = async () => {
-      setIsLoading(true);
-      console.log("📥 Fetching messages: useEffect socket", threadId);
-      try {
-        const url = generalFunctions.createUrl(`messages/${threadId}`);
-        const res = await fetch(url);
-        const data = await res.json();
-        if (!data) {
-          setMessages([]);
-          return;
-        }
-        console.log("📥 Received messages: useEffect socket", data);
-        if(data){
-          const transformedMessages = data?.map((msg: MessageTypes) => ({
+    if(threadMessages && threadMessages.length > 0){
+          const transformedMessages = threadMessages?.map((msg: Message) => ({
           messageId: msg.messageId,
           content: msg.messageContent,
           role: msg.by === "ai" ? "assistant" : "user",
@@ -305,14 +297,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
         }));
         setMessages(transformedMessages);
         }
-        setIsLoading(false);
-      } catch (err) {
-        setIsLoading(false);
-        console.error("❌ Failed to load messages:", err);
-      }
-    };
-    fetchMessages();
-  }, [threadId]);
+  }, [threadId, threadMessages]);
 
   const editMessage = (
     messageId: string,
@@ -387,7 +372,8 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     setIsFirstInteraction,
     isLoading,
     setIsLoading,
-    setPlatform
+    setPlatform,
+    platform
   };
 
   return (

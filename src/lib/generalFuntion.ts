@@ -1,11 +1,17 @@
-import { mainConfig } from "./mainConfig";
 class GeneralFunctions {
+
+    private BASE_URL = "https://fastapi-service-v5-427230556695.asia-south2.run.app";
+    // private BASE_URL = "http://localhost:3500";
     createUrl(apiString: string): string {
-        const url = `${mainConfig.BASE_URL}/${apiString}`;
+        const url = `${this.BASE_URL}/${apiString}`;
         return url;
     }
 
-    getUserId() :string {
+    get baseUrl(){
+        return this.BASE_URL
+    }
+
+    getUserId() :string | "" {
         return localStorage.getItem("userId") || "";
     }
 }

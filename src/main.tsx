@@ -6,9 +6,14 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 import { BrowserRouter } from "react-router-dom";
 import { SocketProvider } from './context/SocketContext.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
-import AppContextProvider from './context/AppContext.tsx';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions:{
+    queries: {
+      staleTime: 5 * 60 * 1000
+    }
+  }
+});
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider
@@ -21,9 +26,7 @@ createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <SocketProvider>
           <AuthProvider>
-            <AppContextProvider>
               <App />
-            </AppContextProvider>
           </AuthProvider>
         </SocketProvider>
       </BrowserRouter>

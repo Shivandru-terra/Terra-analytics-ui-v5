@@ -1,6 +1,7 @@
  interface Message {
   content: string;
-  role: 'user' | 'assistant' | 'system';
+  role: string;
+  // role: 'user' | 'assistant' | 'system';
   timestamp: string;
   type?: 'text' | 'image' | 'chart' | 'data';
   attachments?: {
@@ -9,7 +10,7 @@
     data?: File;
     caption?: string;
   }[];
-  echarts_options?: any;
+  echarts_options?: Record<string, unknown>;
   node?: string;
   can_edit?: boolean;
   is_system?: boolean;
@@ -18,6 +19,8 @@
   summary?: string;
   messageId?: string;
   threadId?: string;
+  messageContent?: string;
+  by?: 'user' | 'ai';
 }
 
 interface ServerStatus {
@@ -45,7 +48,7 @@ interface MessageFromServerType {
   role: "user" | "assistant" | "system";
   is_mini: boolean;
   plots?: PlotType[];
-  echarts_options?: any;
+  echarts_options?: Record<string, unknown>;
   summary?: string;
   node?: string;
   is_interrupt?: boolean;
@@ -76,6 +79,7 @@ interface SocketContextType {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setPlatform: React.Dispatch<React.SetStateAction<string | null>>;
+  platform: string;
 }
 
 type MessageTypes = {
@@ -86,7 +90,7 @@ type MessageTypes = {
   timestamp: string;
   summary?: string;
   is_mini?: boolean;
-  echarts_options?: any;
+  echarts_options?: Record<string, unknown>;
 };
 
 interface MessageTurn {

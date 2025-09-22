@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Plus, BarChart3, Trash2, ChevronDown } from "lucide-react";
 import { generalFunctions } from "@/lib/generalFuntion";
-import { AppContext } from "@/context/AppContext";
 import { toast } from "sonner";
 import { useParams } from "react-router-dom";
 import ThreadSkeleton from "./ui/ThreadSkeleton";
@@ -13,43 +12,39 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { BrandMenu } from "./BrandMenu";
-
-interface ChatThread {
-  threadId: string;
-  title: string;
-  createdAt: string;
-  userId: string;
-  title_category_01?: string;
-  title_category_02?: string
-}
+import { useDeleteThreads, useGetAllThreads } from "@/hooks/use-threads";
+import { ThreadTypeDTO } from "@/types/threadType";
+import { useGetAllUsers } from "@/hooks/use-users";
+import { useSocket } from "@/context/SocketContext";
 
 interface ChatSidebarProps {
   activeThreadId: string | null;
   onThreadSelect: (threadId: string) => void;
   onNewAnalysis: () => void;
-  onArchiveThread?: (threadId: string) => void;
-  // showNewAnalysisButton?: boolean;
 }
 
 export function ChatSidebar({
   activeThreadId,
   onThreadSelect,
   onNewAnalysis,
-  onArchiveThread,
-}: // showNewAnalysisButton = true,
+}:
 ChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [userName, setUsername] = useState<string>(() => {
     return localStorage.getItem("name") || "User";
   });
-  const userId = generalFunctions.getUserId();
-  const { usersData, threadData, setThreadData, isLoading } =
-    useContext(AppContext);
+  const { data: usersData } = useGetAllUsers();
+  const { data: threadData, isLoading } = useGetAllThreads();
+  const { mutate: delThreads } = useDeleteThreads();
+
+
   const { threadId } = useParams();
   const [expandedLevel1, setExpandedLevel1] = useState<Set<string>>(new Set());
   const [expandedLevel2, setExpandedLevel2] = useState<
     Record<string, Set<string>>
   >({});
+  const { platform } =  useSocket();
+  
 
   const toggleLevel1 = (key: string) => {
     setExpandedLevel1((prev) => {
@@ -84,37 +79,23 @@ ChatSidebarProps) {
   );
 
   async function onDeleteChat(id: string) {
-    if (threadId === id) {
-      toast.error("You can't delete the active thread.");
-      return;
-    }
-    const updatedThreads = threadData?.filter(
-      (thread) => thread.threadId !== id
-    );
-    setThreadData(updatedThreads || []);
-    try {
-      const url = generalFunctions.createUrl(`threads/${id}`);
-      const res = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": userId,
-        },
-      });
-      toast.success("Conversation deleted successfully!");
-    } catch (error) {
-      toast.error("Failed to delete thread.");
-      console.log(error);
-    }
+    delThreads(id,{
+      onSuccess: () => {
+        toast.success("Conversation deleted successfully!");
+      },
+      onError: () => {
+        toast.error("Failed to delete thread.");
+      }
+    })
   }
 
-  const normalizeThreads = (threads: ChatThread[]): ChatThread[] => {
+  const normalizeThreads = (threads: ThreadTypeDTO[]): ThreadTypeDTO[] => {
     const validCategories = {
       terra: ["retention", "funnel", "general"],
       game: ["retention", "funnel", "ftue", "general"],
     };
 
-    return threads.map((thread) => {
+    return threads?.map((thread) => {
       let level1 = thread.title_category_01?.toLowerCase();
       let level2 = thread.title_category_02?.toLowerCase();
 
@@ -134,8 +115,8 @@ ChatSidebarProps) {
     });
   };
 
-  const groupThreads = (threads: ChatThread[]) => {
-    return threads.reduce((acc, thread) => {
+  const groupThreads = (threads: ThreadTypeDTO[]) => {
+    return threads?.reduce((acc, thread) => {
       const level1 = thread.title_category_01;
       const level2 = thread.title_category_02;
 
@@ -144,7 +125,7 @@ ChatSidebarProps) {
 
       acc[level1][level2].push(thread);
       return acc;
-    }, {} as Record<string, Record<string, ChatThread[]>>);
+    }, {} as Record<string, Record<string, ThreadTypeDTO[]>>);
   };
 
   const autoExpand: Record<string, string[]> = {
@@ -189,13 +170,10 @@ useEffect(() => {
     <div className="w-80 h-full bg-card/50 backdrop-blur-sm border-r border-border/50 flex flex-col">
       {/* Header */}
       <div className="p-4 flex flex-col gap-3 border-b border-border/50">
-        {/* <button className="flex items-center gap-2 pt-4 cursor-pointer">
-          <img src="/letsterra_logo.jpg" alt="brandLogo" className="w-5 h-5" />
-          <span className="font-semibold text-lg bg-gradient-primary bg-clip-text text-transparent">
-            Analytics AI
-          </span>
-        </button>  */}
+      <div className="flex justify-start items-end gap-4">
         <BrandMenu />
+        <span className="uppercase text-xs text-muted-foreground pb-1">{platform}</span>
+      </div>
         <p className="text-sm text-muted-foreground font-[600] text-[#000] dark:text-[#fff]">
           Hello, {userName}
         </p>
@@ -222,7 +200,7 @@ useEffect(() => {
       <div className="flex-1 overflow-y-auto p-2">
         {isLoading
           ? Array.from({ length: 2 }).map((_, i) => <ThreadSkeleton key={i} />)
-          : Object.entries(groupedThreads).map(([level1, level2Map]) => (
+          : Object?.entries(groupedThreads || {})?.map(([level1, level2Map]) => (
               <div key={level1} className="mb-2">
                 {/* Level 1 */}
                 <Collapsible
@@ -245,7 +223,7 @@ useEffect(() => {
                     <div className="absolute left-4 top-0 bottom-0 w-px bg-border/70"></div>
 
                     <div className="pl-6 space-y-1">
-                      {Object.entries(level2Map).map(([level2, threads]) => (
+                      {Object?.entries(level2Map)?.map(([level2, threads]) => (
                         <div key={`${level1}-${level2}`} className="relative">
                           {/* Level 2 */}
                           <Collapsible

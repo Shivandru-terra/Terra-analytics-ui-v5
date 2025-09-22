@@ -11,29 +11,6 @@ import { ChatSidebar } from './ChatSidebar';
 import { ChatPiping } from './ChatPiping';
 import { ThemeToggle } from './ThemeToggle';
 import { LearningQueue } from './LearningQueue';
-import { stat } from 'fs';
-
-interface Message {
-  id: string;
-  content: string;
-  isUser: boolean;
-  timestamp: string;
-  threadId?: string;
-  messageId?: string;
-}
-
-interface Thread {
-  id: string;
-  title: string;
-  date: string;
-  userFirstName: string;
-  messages: Message[];
-  threadId?: string;
-}
-
-
-
-
 
 export function AnalyticsChat() {
   const navigate = useNavigate();
@@ -45,8 +22,8 @@ export function AnalyticsChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const userId = generalFunctions.getUserId();
   const { messages, sendMessage, status, socket, editMessage } = useSocket();
+  const [hasLiked, setHasLiked] = useState(false);
   const isLoading = status.status === 'processing';
-  // const isLoading = status.status === 'processing' || status.status === 'initializing';
 
   console.log("status for test", status);
 
@@ -72,7 +49,7 @@ export function AnalyticsChat() {
     setActiveThreadId(newThreadId);
     setHasStartedChat(false);
   }, [navigate, userId]);
-  const [hasLiked, setHasLiked] = useState(false);
+  
 
   useEffect(() => {
     if (!activeThreadId) {
@@ -95,9 +72,6 @@ export function AnalyticsChat() {
 
   console.log("status testing", status);
 
-  // useEffect(()=>{
-  //   const safeStage = status?.step || status?.status || "" ;
-  // },[status])
 
   const safeStage = status?.step || status?.status || "" ;
 
@@ -132,17 +106,8 @@ const getValidISOString = (input: unknown): string => {
     const isoTime = getValidISOString(timestamp);
     editMessage(messageId, newContent, "True" , isoTime);
     toast.success("Editing...!");
-    // if (jumpTo) {
-    // }
   };
 
-  const handleArchiveThread = (threadId: string) => {
-    // setThreads(prev => prev.filter(thread => thread.id !== threadId));
-    // if (activeThreadId === threadId) {
-    //   setActiveThreadId(null);
-    //   setHasStartedChat(false);
-    // }
-  };
   console.log("messages from analytics chat", messages);
 
   return (
@@ -158,7 +123,6 @@ const getValidISOString = (input: unknown): string => {
         activeThreadId={activeThreadId}
         onThreadSelect={handleThreadSelect}
         onNewAnalysis={handleNewAnalysis}
-        onArchiveThread={handleArchiveThread}
       />
       
       <div className="flex-1 flex flex-col">
