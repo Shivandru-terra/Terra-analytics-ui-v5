@@ -14,10 +14,11 @@ class ThreadServices {
         },
       });
       const data: ThreadTypeDTO[] = await res.json();
-      return data.sort(
-        (a: ThreadTypeDTO, b: ThreadTypeDTO) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      ).map((el)=>ThreadModal.fromDTO(el));
+      return data.map((el)=>ThreadModal.fromDTO(el));
+      // return data.sort(
+      //   (a: ThreadTypeDTO, b: ThreadTypeDTO) =>
+      //     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      // ).map((el)=>ThreadModal.fromDTO(el));
     } catch (error) {
       throw new Error("Failed to fetch threads");
     }

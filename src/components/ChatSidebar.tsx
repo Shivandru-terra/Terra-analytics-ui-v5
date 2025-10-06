@@ -262,7 +262,7 @@ useEffect(() => {
                               <div className="pl-6 space-y-1">
                                 {/* Level 3 - Threads */}
                                 {threads.map((thread) => {
-                                  const user = usersData.find(
+                                  const user = usersData?.find(
                                     (u) => u.userId === thread.userId
                                   );
                                   const displayName =
