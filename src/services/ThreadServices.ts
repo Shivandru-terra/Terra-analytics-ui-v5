@@ -6,7 +6,13 @@ class ThreadServices {
   async fetchAllThreads(): Promise<ThreadTypeDTO[]> {
     try {
       const threadUrl = generalFunctions.createUrl("threads");
-      const res = await fetch(threadUrl);
+      const res = await fetch(threadUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          // "x-user-id": generalFunctions.getUserId(),
+        },
+      });
       const data: ThreadTypeDTO[] = await res.json();
       return data.sort(
         (a: ThreadTypeDTO, b: ThreadTypeDTO) =>

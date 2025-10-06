@@ -1,21 +1,21 @@
-import { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, Plus, BarChart3, Trash2, ChevronDown } from "lucide-react";
-import { generalFunctions } from "@/lib/generalFuntion";
-import { toast } from "sonner";
-import { useParams } from "react-router-dom";
-import ThreadSkeleton from "./ui/ThreadSkeleton";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { BrandMenu } from "./BrandMenu";
-import { useDeleteThreads, useGetAllThreads } from "@/hooks/use-threads";
-import { ThreadTypeDTO } from "@/types/threadType";
-import { useGetAllUsers } from "@/hooks/use-users";
+import { Input } from "@/components/ui/input";
 import { useSocket } from "@/context/SocketContext";
+import { useDeleteThreads, useGetAllThreads } from "@/hooks/use-threads";
+import { useGetAllUsers } from "@/hooks/use-users";
+import { ThreadTypeDTO } from "@/types/threadType";
+import { ChevronDown, Plus, Search, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { BrandMenu } from "./BrandMenu";
+import DataUploadModal from "./DataUploadModal";
+import ThreadSkeleton from "./ui/ThreadSkeleton";
 
 interface ChatSidebarProps {
   activeThreadId: string | null;
@@ -43,6 +43,7 @@ ChatSidebarProps) {
   const [expandedLevel2, setExpandedLevel2] = useState<
     Record<string, Set<string>>
   >({});
+  const [dataUploadModal, setDataUploadModal] = useState(false);
   const { platform } =  useSocket();
   
 
@@ -185,6 +186,14 @@ useEffect(() => {
           <Plus className="w-4 h-4 mr-2" />
           New Analysis
         </Button>
+        <Button
+          onClick={()=>setDataUploadModal(true)}
+          variant="outline"
+          className="w-full hover:shadow-glow text-white mb-4 cyber-glow transition-all duration-smooth"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Update Schema
+        </Button>
 
         {/* Search */}
         <div className="relative">
@@ -324,6 +333,7 @@ useEffect(() => {
               </div>
             ))}
       </div>
+      <DataUploadModal isOpen={dataUploadModal} onClose={setDataUploadModal} />
     </div>
   );
 }
