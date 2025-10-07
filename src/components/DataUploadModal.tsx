@@ -77,6 +77,7 @@ const DataUploadModal = ({ isOpen, onClose }) => {
               <SelectItem value="Game_List">Game_List</SelectItem>
               <SelectItem value="Game_List_2">Game_List_2</SelectItem>
               <SelectItem value="Game_Values">Game_Values</SelectItem>
+              <SelectItem value="Game_Values_2">Game_Values_2</SelectItem>
               <SelectItem value="Merged_schema">Merged_schema</SelectItem>
               <SelectItem value="Merged_schema_2">Merged_schema_2</SelectItem>
               <SelectItem value="User_Journey">User_Journey</SelectItem>
