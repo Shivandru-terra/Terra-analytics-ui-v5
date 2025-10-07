@@ -51,6 +51,26 @@ class ThreadServices {
       throw new Error("Failed to fetch messages");
     }
   }
+
+  async createThread(newThreadId: string){
+    try {
+      const url = generalFunctions.createUrl("threads/create");
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: generalFunctions.getUserId(),
+          threadId: newThreadId,
+        }),
+      });
+      const data = await res.json();
+      console.log("data from create thread", data);
+    } catch (error) {
+      throw new Error("Failed to create thread");
+    }
+  }
 }
 
 export const threadServices = new ThreadServices();

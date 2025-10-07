@@ -6,7 +6,6 @@ import { MessageContent } from './MessageContent';
 import { useSocket } from '@/context/SocketContext';
 import { toast } from 'sonner';
 import { useParams } from 'react-router-dom';
-import type { Message } from '@/types/chatTypes';
 
 type Role = 'human' | 'ai' | 'user' | 'assistant';
 interface MessageTurn {

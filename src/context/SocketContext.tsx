@@ -285,7 +285,6 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
   };
 
   useEffect(() => {
-    if(threadMessages && threadMessages.length > 0){
           const transformedMessages = threadMessages?.map((msg: Message) => ({
           messageId: msg.messageId,
           content: msg.messageContent,
@@ -295,8 +294,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
           is_mini: msg.is_mini,
           echarts_options: msg.echarts_options
         }));
-        setMessages(transformedMessages);
-        }
+        setMessages(transformedMessages || []);
   }, [threadId, threadMessages]);
 
   const editMessage = (

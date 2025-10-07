@@ -11,6 +11,7 @@ import { ChatSidebar } from './ChatSidebar';
 import { ChatPiping } from './ChatPiping';
 import { ThemeToggle } from './ThemeToggle';
 import { LearningQueue } from './LearningQueue';
+import { useCreateThread } from '@/hooks/use-threads';
 
 export function AnalyticsChat() {
   const navigate = useNavigate();
@@ -22,40 +23,53 @@ export function AnalyticsChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const userId = generalFunctions.getUserId();
   const { messages, sendMessage, status, socket, editMessage } = useSocket();
+  const {mutate: createThread} = useCreateThread()
   const [hasLiked, setHasLiked] = useState(false);
   const isLoading = status.status === 'processing';
 
-  console.log("status for test", status);
 
-  const handleNewAnalysis = useCallback(async () => {
+  const handleNewAnalysis = async () => {
     const newThreadId = `t-${uuidv4()}`;
     navigate(`/dashboard/${newThreadId}`);
-    try {
-      const url = generalFunctions.createUrl("threads/create");
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId,
-          threadId: newThreadId,
-        }),
-      });
-      await res.json();
-    } catch (error) {
-      console.log(`error`, error);
-    }
-    setActiveThreadId(newThreadId);
-    setHasStartedChat(false);
-  }, [navigate, userId]);
+    createThread(newThreadId,{
+      onSuccess: () => {
+        setActiveThreadId(newThreadId);
+        setHasStartedChat(false);
+      },
+      onError: () => {
+        toast.error('Failed to create thread');
+      }
+    })
+  };
+  // const handleNewAnalysis = useCallback(async () => {
+  //   const newThreadId = `t-${uuidv4()}`;
+  //   navigate(`/dashboard/${newThreadId}`);
+  //   try {
+  //     const url = generalFunctions.createUrl("threads/create");
+  //     const res = await fetch(url, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         userId,
+  //         threadId: newThreadId,
+  //       }),
+  //     });
+  //     await res.json();
+  //   } catch (error) {
+  //     console.log(`error`, error);
+  //   }
+  //   setActiveThreadId(newThreadId);
+  //   setHasStartedChat(false);
+  // }, [navigate, userId]);
   
 
   useEffect(() => {
     if (!activeThreadId) {
       handleNewAnalysis();
     }
-  }, [activeThreadId, handleNewAnalysis]);
+  }, [activeThreadId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

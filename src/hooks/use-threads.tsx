@@ -8,6 +8,17 @@ export function useGetAllThreads(){
     })
 }
 
+export function useCreateThread(){
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationKey: ["create-thread"],
+        mutationFn: (newThreadId: string) => threadServices.createThread(newThreadId),
+        onSuccess: () => queryClient.invalidateQueries({
+            // queryKey: ["threads"]
+        }),
+    })
+}
+
 export function useDeleteThreads(){
     const queryClient = useQueryClient();
     return useMutation({
