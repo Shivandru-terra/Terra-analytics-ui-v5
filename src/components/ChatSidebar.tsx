@@ -40,6 +40,7 @@ ChatSidebarProps) {
     Record<string, Set<string>>
   >({});
   const [dataUploadModal, setDataUploadModal] = useState(false);
+  const [platformThreads, setPlatformThreads] = useState([]);
   const { platform } =  useSocket();
   
 
@@ -71,7 +72,14 @@ ChatSidebarProps) {
     }
   }, []);
 
-  const platformThreads = threadData?.filter((thread) => thread?.platform === platform);
+  useEffect(()=>{
+    if(threadData){
+      setPlatformThreads(threadData?.filter((thread) => thread?.platform === platform));
+    }
+  },[threadData, platform])
+
+  console.log("threadData testing", threadData);
+
 
   const filteredThreads = platformThreads?.filter((thread) =>
     thread.title?.toLowerCase().includes(searchQuery.toLowerCase())

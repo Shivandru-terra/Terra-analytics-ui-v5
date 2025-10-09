@@ -9,7 +9,8 @@ export class ThreadModal implements ThreadTypeDTO {
     public readonly num_of_msgs: number,
     public readonly title_category_01: string,
     public readonly title_category_02: string,
-    public readonly status_indicator: string
+    public readonly status_indicator: string,
+    public readonly platform: "terra" | "ai_games"
   ) {}
 
   formatTime() {
@@ -32,7 +33,8 @@ export class ThreadModal implements ThreadTypeDTO {
       thread.num_of_msgs,
       thread.title_category_01,
       thread.title_category_02,
-      thread.status_indicator
+      thread.status_indicator,
+      thread.platform
     );
   }
 
@@ -46,6 +48,7 @@ export class ThreadModal implements ThreadTypeDTO {
       title_category_01: this.title_category_01,
       title_category_02: this.title_category_02,
       status_indicator: this.status_indicator,
+      platform: this.platform
     };
   }
 }
