@@ -11,7 +11,6 @@ import { useGetAllUsers } from "@/hooks/use-users";
 import { ThreadTypeDTO } from "@/types/threadType";
 import { ChevronDown, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { BrandMenu } from "./BrandMenu";
 import DataUploadModal from "./DataUploadModal";
@@ -36,9 +35,6 @@ ChatSidebarProps) {
   const { data: usersData } = useGetAllUsers();
   const { data: threadData, isLoading } = useGetAllThreads();
   const { mutate: delThreads } = useDeleteThreads();
-
-
-  const { threadId } = useParams();
   const [expandedLevel1, setExpandedLevel1] = useState<Set<string>>(new Set());
   const [expandedLevel2, setExpandedLevel2] = useState<
     Record<string, Set<string>>
@@ -75,7 +71,9 @@ ChatSidebarProps) {
     }
   }, []);
 
-  const filteredThreads = threadData?.filter((thread) =>
+  const platformThreads = threadData?.filter((thread) => thread?.platform === platform);
+
+  const filteredThreads = platformThreads?.filter((thread) =>
     thread.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -172,7 +170,9 @@ useEffect(() => {
       {/* Header */}
       <div className="p-4 flex flex-col gap-3 border-b border-border/50">
       <div className="flex justify-start items-end gap-4">
-        <BrandMenu />
+        <BrandMenu 
+        onNewAnalysis={onNewAnalysis}
+        />
         <span className="uppercase text-xs text-muted-foreground pb-1">{platform}</span>
       </div>
         <p className="text-sm text-muted-foreground font-[600] text-[#000] dark:text-[#fff]">
@@ -189,7 +189,7 @@ useEffect(() => {
         <Button
           onClick={()=>setDataUploadModal(true)}
           variant="outline"
-          className="w-full hover:shadow-glow text-white mb-4 cyber-glow transition-all duration-smooth"
+          className="w-full hover:shadow-glow text-primary mb-4 cyber-glow transition-all duration-smooth"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Update Schema

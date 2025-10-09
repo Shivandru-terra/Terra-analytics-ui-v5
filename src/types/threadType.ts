@@ -7,4 +7,5 @@ export type ThreadTypeDTO = {
     title_category_01: string;
     title_category_02: string;
     status_indicator: string;
+    platform: "terra" | "ai_games";
 }

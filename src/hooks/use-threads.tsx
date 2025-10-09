@@ -9,13 +9,13 @@ export function useGetAllThreads(){
 }
 
 export function useCreateThread(){
-    const queryClient = useQueryClient();
+    // const queryClient = useQueryClient();
     return useMutation({
         mutationKey: ["create-thread"],
-        mutationFn: (newThreadId: string) => threadServices.createThread(newThreadId),
-        onSuccess: () => queryClient.invalidateQueries({
-            // queryKey: ["threads"]
-        }),
+        mutationFn: (threadData: {threadId: string, platform: string}) => threadServices.createThread(threadData),
+        // onSuccess: () => queryClient.invalidateQueries({
+        //     queryKey: ["threads"]
+        // }),
     })
 }
 

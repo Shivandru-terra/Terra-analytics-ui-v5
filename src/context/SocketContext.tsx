@@ -12,6 +12,7 @@ import { Socket } from "socket.io-client";
 import { useSocketHandle } from "./useSocketHandle";
 import { v4 as uuidv4 } from "uuid";
 import { useMessages } from "@/hooks/use-threads";
+import { useQueryClient } from "@tanstack/react-query";
 
 // --- Context ---
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -32,7 +33,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     setThreadId(newThreadId);
     console.log("🔄 Updated threadId:", newThreadId);
   }, [location.pathname]);
-
+  const queryClient = useQueryClient();
   const [messages, setMessages] = useState<Message[]>([]);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [status, setStatus] = useState<ServerStatus>({
@@ -49,8 +50,6 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
   const { data: threadMessages } = useMessages(threadId);
 
   console.log("threadMessages from react query", threadMessages);
-
-  
 
   useEffect(() => {
     if (!socket) return;
@@ -103,7 +102,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
         );
       }
     };
-    console.log("Server status 2", status)
+    console.log("Server status 2", status);
     const handleServerMessage = (data: MessageFromServerType) => {
       console.log("🔍 Message from server:", data);
       console.log("🔍 Data type:", typeof data);
@@ -164,7 +163,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
           attachments: attachments.length > 0 ? attachments : undefined,
           echarts_options: data.echarts_options,
           is_mini: data.is_mini || false,
-          summary: data.summary || ""
+          summary: data.summary || "",
         };
 
         // console.log("🔍 Final message object:", newMessage);
@@ -208,7 +207,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
               ? "Here are the results of your query:"
               : "The query executed successfully.",
           timestamp: formatISTTime(new Date()),
-          attachments: attachments
+          attachments: attachments,
         };
         const introMessage =
           "We were at: Hello! I am your Mixpanel AI assistant. Please provide your analytics query.";
@@ -261,7 +260,11 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
 
       // Send either regular message or jump request
       if (jumpTo) {
-        console.log("📤 Sending jump message with threadId:", threadId, messages);
+        console.log(
+          "📤 Sending jump message with threadId:",
+          threadId,
+          messages
+        );
         socket.emit("user_message", {
           message: content,
           userId,
@@ -285,16 +288,16 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
   };
 
   useEffect(() => {
-          const transformedMessages = threadMessages?.map((msg: Message) => ({
-          messageId: msg.messageId,
-          content: msg.messageContent,
-          role: msg.by === "ai" ? "assistant" : "user",
-          timestamp: formatISTTime(msg.timestamp),
-          summary: msg.summary,
-          is_mini: msg.is_mini,
-          echarts_options: msg.echarts_options
-        }));
-        setMessages(transformedMessages || []);
+    const transformedMessages = threadMessages?.map((msg: Message) => ({
+      messageId: msg.messageId,
+      content: msg.messageContent,
+      role: msg.by === "ai" ? "assistant" : "user",
+      timestamp: formatISTTime(msg.timestamp),
+      summary: msg.summary,
+      is_mini: msg.is_mini,
+      echarts_options: msg.echarts_options,
+    }));
+    setMessages(transformedMessages || []);
   }, [threadId, threadMessages]);
 
   const editMessage = (
@@ -371,7 +374,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     isLoading,
     setIsLoading,
     setPlatform,
-    platform
+    platform,
   };
 
   return (

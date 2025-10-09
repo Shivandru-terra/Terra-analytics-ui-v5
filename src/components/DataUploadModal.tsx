@@ -1,6 +1,13 @@
-import React, { useState, useRef } from "react";
-import { Dialog, DialogContent } from "./ui/dialog";
+import { useAddCsvDataToFirestore } from "@/hooks/use-csv";
+import {
+  useGetAllDocs,
+  useGetDocData,
+  useUpdateDocData,
+} from "@/hooks/use-docs";
+import { useGetAllWorkSheets } from "@/hooks/use-workbook";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
+import { Dialog, DialogContent } from "./ui/dialog";
 import {
   Select,
   SelectContent,
@@ -8,117 +15,105 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { generalFunctions } from "@/lib/generalFuntion";
+import { Textarea } from "./ui/textarea";
+import { useSocket } from "@/context/SocketContext";
 
 const DataUploadModal = ({ isOpen, onClose }) => {
-  const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [option, setOption] = useState<string>("");
-  const fileRef = useRef<HTMLInputElement>(null);
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.length) {
-      const selectedFile = e.target.files[0];
-      if (!selectedFile.name.toLowerCase().endsWith(".csv")) {
-        setMessage("❌ Only CSV files are allowed.");
-        setFile(null);
-        if (fileRef.current) fileRef.current.value = ""; // reset input
-        return;
-      }
-      setFile(e.target.files[0]);
-      setMessage(null);
+  const [workSheet, setWorkSheet] = useState("");
+  const { data: docsList } = useGetAllDocs(isOpen);
+  const { data: workSheets } = useGetAllWorkSheets(isOpen);
+  const { data: docData } = useGetDocData(option);
+  const [content, setContent] = useState("");
+  const { mutate: updateDoc } = useUpdateDocData(option);
+  const { mutate: addCsvData, isPending } = useAddCsvDataToFirestore()
+  const { platform } = useSocket();
+  const [filteredDocs, setFilteredDocs] = useState<string[]>([]);
+
+  // workBookData is the raw array from your backend
+
+  useEffect(() => {
+    if (docData) {
+      setContent(docData.content);
     }
-  };
+  }, [docData]);
 
-  const handleUpload = async () => {
-    if (!file) {
-      setMessage("Please select a CSV file first.");
-      return;
-    }
+  useEffect(() => {
+  if (!docsList) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("doc_id", option);
+  const filtered = platform === "terra"
+    ? docsList.filter((doc) => !doc.includes("_2"))
+    : docsList.filter((doc) => doc.includes("_2"));
 
-    setUploading(true);
-    setMessage(null);
+  setFilteredDocs(filtered);
+}, [platform, docsList]);
 
-    try {
-      const url = generalFunctions.createUrl("addData");
-
-      const res = await fetch(url, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Upload failed");
-
-      const result = await res.json();
-      setMessage(`✅ Uploaded: ${result.filename || file.name}`);
-      setFile(null);
+  useEffect(() => {
+    if (!isOpen) {
+      setContent("");
       setOption("");
-    } catch (err) {
-      setMessage("❌ Error uploading file.");
-    } finally {
-      setUploading(false);
+      setWorkSheet("");
     }
+  }, [isOpen]);
+
+  const handleUpload = () => {
+    addCsvData({ doc_id: option, sheetName: workSheet })
   };
+
+  function handleUpdate() {
+    updateDoc(content);
+  }
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[40vw] max-h-[50vh] px-4 py-12 flex flex-col gap-8 justify-center items-center">
-        <div className="w-[70%] flex items-center justify-center">
-          <Select value={option} onValueChange={setOption}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="-- Select Option --" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Brand">Brand</SelectItem>
-              <SelectItem value="Brand_2">Brand_2</SelectItem>
-              <SelectItem value="Game_List">Game_List</SelectItem>
-              <SelectItem value="Game_List_2">Game_List_2</SelectItem>
-              <SelectItem value="Game_Values">Game_Values</SelectItem>
-              <SelectItem value="Game_Values_2">Game_Values_2</SelectItem>
-              <SelectItem value="Merged_schema">Merged_schema</SelectItem>
-              <SelectItem value="Merged_schema_2">Merged_schema_2</SelectItem>
-              <SelectItem value="User_Journey">User_Journey</SelectItem>
-              <SelectItem value="User_Journey_2">User_Journey_2</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        {option && (
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-3 rounded-md shadow-sm w-[90%]">
-            <p className="text-sm font-medium">
-              ⚠️ Make sure the file follows the correct schema as per{" "}
-              <span className="font-semibold">{option}</span> collection
-            </p>
+      <DialogContent className="max-w-[50vw] max-h-[80vh] px-4 py-6 flex flex-col gap-8">
+        {/* Selects / options */}
+        {docData && (
+          <div className="p-4">
+            <Textarea
+              value={content || ""}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full h-[20vh]"
+            />
+            <Button variant="outline" className="mt-4" onClick={handleUpdate}>
+              Update
+            </Button>
           </div>
         )}
-        <div className="w-full h-auto flex items-center justify-center gap-4">
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".csv"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-          <Button
-            variant="secondary"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-          >
-            {file ? `📄 ${file.name}` : "Choose CSV File"}
-          </Button>
+        <div className="flex flex-col gap-4 w-full md:w-3/4 mx-auto">
+          <Select value={option} onValueChange={setOption}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="-- Select Firestore Schema --" />
+            </SelectTrigger>
+            <SelectContent>
+              {filteredDocs?.map((el: string) => (
+                <SelectItem key={el} value={el}>
+                  {el}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-          {/* Upload button */}
+          <Select value={workSheet} onValueChange={setWorkSheet}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="-- Select WorkSheet --" />
+            </SelectTrigger>
+            <SelectContent>
+              {workSheets?.map((el: string) => (
+                <SelectItem key={el} value={el}>
+                  {el}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Button
             onClick={handleUpload}
-            disabled={!file || uploading}
+            disabled={!workSheet || !option}
             className="cursor-pointer"
           >
-            {uploading ? "Uploading..." : "Upload CSV"}
+            {isPending ? "Uploading..." : "Upload CSV"}
           </Button>
         </div>
-          {message && <p className="text-sm">{message}</p>}
       </DialogContent>
     </Dialog>
   );

@@ -8,7 +8,7 @@ class GeneralFunctions {
         return url;
     }
 
-    get baseUrl(){
+    get baseUrl() {
         return this.BASE_URL
     }
 

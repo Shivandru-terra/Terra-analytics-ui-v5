@@ -10,7 +10,7 @@ import { useSocket } from "@/context/SocketContext"
 import { generalFunctions } from "@/lib/generalFuntion";
 import { useEffect } from "react";
 
-export function BrandMenu() {
+export function BrandMenu({ onNewAnalysis }: { onNewAnalysis: () => void }) {
   const { setPlatform } = useSocket();
   async function handlePlatform(platform: string){
     try {
@@ -18,6 +18,16 @@ export function BrandMenu() {
       const res = await fetch(url);
       const data = await res.json();
       console.log("data chnage platform:", data);
+    } catch (error) {
+      console.log("error:", error);
+    }
+  }
+
+  async function handleMenuClick(platform: string){
+    try {
+      onNewAnalysis();
+      setPlatform(platform);
+      // await handlePlatform(platform);
     } catch (error) {
       console.log("error:", error);
     }
@@ -42,13 +52,8 @@ export function BrandMenu() {
       <DropdownMenuContent className="w-48">
         <DropdownMenuLabel>Analytics</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer" onClick={() => {
-          setPlatform("terra") 
-          handlePlatform("terra")
-        }}>Terra Games</DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer" onClick={() => {
-          setPlatform("ai_games") 
-          handlePlatform("ai_games")}}>AI Games</DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer" onClick={() => {handleMenuClick("terra")}}>Terra Games</DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer" onClick={() => {handleMenuClick("ai_games")}}>AI Games</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

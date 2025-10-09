@@ -1,6 +1,7 @@
 import { generalFunctions } from "@/lib/generalFuntion";
 import { ThreadModal } from "@/models/ThreadModel";
 import { ThreadTypeDTO } from "@/types/threadType";
+import { platform } from "os";
 
 class ThreadServices {
   async fetchAllThreads(): Promise<ThreadTypeDTO[]> {
@@ -52,7 +53,7 @@ class ThreadServices {
     }
   }
 
-  async createThread(newThreadId: string){
+  async createThread(threadData: {threadId: string, platform: string}): Promise<void> {
     try {
       const url = generalFunctions.createUrl("threads/create");
       const res = await fetch(url, {
@@ -62,7 +63,8 @@ class ThreadServices {
         },
         body: JSON.stringify({
           userId: generalFunctions.getUserId(),
-          threadId: newThreadId,
+          threadId: threadData.threadId,
+          platform: threadData.platform
         }),
       });
       const data = await res.json();

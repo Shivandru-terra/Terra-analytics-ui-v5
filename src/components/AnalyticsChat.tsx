@@ -1,17 +1,17 @@
 import { useSocket } from '@/context/SocketContext';
+import { useCreateThread } from '@/hooks/use-threads';
 import { generalFunctions } from '@/lib/generalFuntion';
 import { Bot } from 'lucide-react';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
 import { ChatInput } from './ChatInput';
 import { ChatMessage } from './ChatMessage';
-import { ChatSidebar } from './ChatSidebar';
 import { ChatPiping } from './ChatPiping';
-import { ThemeToggle } from './ThemeToggle';
+import { ChatSidebar } from './ChatSidebar';
 import { LearningQueue } from './LearningQueue';
-import { useCreateThread } from '@/hooks/use-threads';
+import { ThemeToggle } from './ThemeToggle';
 
 export function AnalyticsChat() {
   const navigate = useNavigate();
@@ -19,10 +19,9 @@ export function AnalyticsChat() {
   const [activeThreadId, setActiveThreadId] = useState<string | null>(threadId || "");
   const [hasStartedChat, setHasStartedChat] = useState(false);
   const [rememberedMessages, setRememberedMessages] = useState<Set<string>>(new Set());
-  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const userId = generalFunctions.getUserId();
-  const { messages, sendMessage, status, socket, editMessage } = useSocket();
+  const { messages, sendMessage, status, socket, editMessage, platform } = useSocket();
   const {mutate: createThread} = useCreateThread()
   const [hasLiked, setHasLiked] = useState(false);
   const isLoading = status.status === 'processing';
@@ -31,7 +30,12 @@ export function AnalyticsChat() {
   const handleNewAnalysis = async () => {
     const newThreadId = `t-${uuidv4()}`;
     navigate(`/dashboard/${newThreadId}`);
-    createThread(newThreadId,{
+    const payload = {
+      threadId: newThreadId,
+      platform
+    }
+
+    createThread(payload, {
       onSuccess: () => {
         setActiveThreadId(newThreadId);
         setHasStartedChat(false);
@@ -41,29 +45,6 @@ export function AnalyticsChat() {
       }
     })
   };
-  // const handleNewAnalysis = useCallback(async () => {
-  //   const newThreadId = `t-${uuidv4()}`;
-  //   navigate(`/dashboard/${newThreadId}`);
-  //   try {
-  //     const url = generalFunctions.createUrl("threads/create");
-  //     const res = await fetch(url, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         userId,
-  //         threadId: newThreadId,
-  //       }),
-  //     });
-  //     await res.json();
-  //   } catch (error) {
-  //     console.log(`error`, error);
-  //   }
-  //   setActiveThreadId(newThreadId);
-  //   setHasStartedChat(false);
-  // }, [navigate, userId]);
-  
 
   useEffect(() => {
     if (!activeThreadId) {
@@ -128,8 +109,7 @@ const getValidISOString = (input: unknown): string => {
     <div className="h-screen bg-gradient-bg flex">
       {/* Header */}
       <div className="fixed top-0 right-0 z-50 p-4">
-        {(userId === "u-923f0553-2728-4545-9f95-80dd29c74537" || userId === "u-2b334b0d-a6ba-4730-949b-f29f201987a2") && <LearningQueue />}
-        {/* <LearningQueue /> */}
+        {/* {(userId === "u-923f0553-2728-4545-9f95-80dd29c74537" || userId === "u-2b334b0d-a6ba-4730-949b-f29f201987a2" || userId === "u-7ca18dfc-85bf-4653-a19f-a6555c0e04f5") && <LearningQueue />} */}
         <ThemeToggle />
       </div>
       
