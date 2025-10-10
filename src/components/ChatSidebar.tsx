@@ -38,7 +38,6 @@ ChatSidebarProps) {
     Record<string, Set<string>>
   >({});
   const [dataUploadModal, setDataUploadModal] = useState(false);
-  const [platformThreads, setPlatformThreads] = useState([]);
   const { platform } =  useSocket();
   
 
@@ -63,13 +62,7 @@ ChatSidebarProps) {
     });
   };
 
-  useEffect(()=>{
-    if(threadData){
-      setPlatformThreads(threadData?.filter((thread) => thread?.platform === platform));
-    }
-  },[threadData, platform])
-
-
+const platformThreads = threadData?.filter((thread) => thread?.platform === platform);
 
   const filteredThreads = platformThreads?.filter((thread) =>
     thread.title?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -160,7 +153,7 @@ useEffect(() => {
   setExpandedLevel1(level1Set);
   setExpandedLevel2(level2Record);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [threadData, filteredThreads]);
+}, [threadData]);
 
 
   return (

@@ -1,18 +1,18 @@
-import { formatISTTime } from "@/lib/utils";
+import { useMessages } from "@/hooks/use-threads";
 import { generalFunctions } from "@/lib/generalFuntion";
+import { formatISTTime } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
   ReactNode,
   useContext,
   useEffect,
-  useState,
+  useState
 } from "react";
 import { useLocation } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { useSocketHandle } from "./useSocketHandle";
 import { v4 as uuidv4 } from "uuid";
-import { useMessages } from "@/hooks/use-threads";
-import { useQueryClient } from "@tanstack/react-query";
+import { useSocketHandle } from "./useSocketHandle";
 
 // --- Context ---
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -360,6 +360,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     }
     setIsLoading(false);
   };
+  
 
   const value = {
     socket,

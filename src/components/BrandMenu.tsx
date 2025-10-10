@@ -1,16 +1,16 @@
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useSocket } from "@/context/SocketContext"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useSocket } from "@/context/SocketContext";
 import { generalFunctions } from "@/lib/generalFuntion";
-import { useEffect } from "react";
 
 export function BrandMenu({ onNewAnalysis }: { onNewAnalysis: () => void }) {
+  console.log("🔄 Component rendering...");
   const { setPlatform } = useSocket();
   async function handlePlatform(platform: string){
     try {
@@ -27,7 +27,7 @@ export function BrandMenu({ onNewAnalysis }: { onNewAnalysis: () => void }) {
     try {
       onNewAnalysis();
       setPlatform(platform);
-      // await handlePlatform(platform);
+      await handlePlatform(platform);
     } catch (error) {
       console.log("error:", error);
     }
