@@ -126,7 +126,7 @@ ChatSidebarProps) {
   };
 
   const autoExpand: Record<string, string[]> = {
-  game: ["funnel"],
+  game: [],
   terra: []
 };
 
@@ -160,7 +160,7 @@ useEffect(() => {
   setExpandedLevel1(level1Set);
   setExpandedLevel2(level2Record);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [filteredThreads]);
+}, [threadData, filteredThreads]);
 
 
   return (
