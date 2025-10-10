@@ -15,6 +15,10 @@ class GeneralFunctions {
     getUserId() :string | "" {
         return localStorage.getItem("userId") || "";
     }
+
+    getUserName () : string | "" {
+        return localStorage.getItem("name") || "User";
+    }
 }
 
 export const generalFunctions = new GeneralFunctions();

@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { BrandMenu } from "./BrandMenu";
 import DataUploadModal from "./DataUploadModal";
 import ThreadSkeleton from "./ui/ThreadSkeleton";
+import { generalFunctions } from "@/lib/generalFuntion";
 
 interface ChatSidebarProps {
   activeThreadId: string | null;
@@ -29,9 +30,6 @@ export function ChatSidebar({
 }:
 ChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [userName, setUsername] = useState<string>(() => {
-    return localStorage.getItem("name") || "User";
-  });
   const { data: usersData } = useGetAllUsers();
   const { data: threadData, isLoading } = useGetAllThreads();
   const { mutate: delThreads } = useDeleteThreads();
@@ -65,20 +63,12 @@ ChatSidebarProps) {
     });
   };
 
-  useEffect(() => {
-    const name = localStorage.getItem("name");
-    if (name) {
-      setUsername(name);
-    }
-  }, []);
-
   useEffect(()=>{
     if(threadData){
       setPlatformThreads(threadData?.filter((thread) => thread?.platform === platform));
     }
   },[threadData, platform])
 
-  console.log("threadData testing", threadData);
 
 
   const filteredThreads = platformThreads?.filter((thread) =>
@@ -170,7 +160,7 @@ useEffect(() => {
   setExpandedLevel1(level1Set);
   setExpandedLevel2(level2Record);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [threadData]);
+}, [filteredThreads]);
 
 
   return (
@@ -184,7 +174,7 @@ useEffect(() => {
         <span className="uppercase text-xs text-muted-foreground pb-1">{platform}</span>
       </div>
         <p className="text-sm text-muted-foreground font-[600] text-[#000] dark:text-[#fff]">
-          Hello, {userName}
+          Hello, {generalFunctions.getUserName()}
         </p>
 
         <Button
