@@ -127,7 +127,8 @@ const getValidISOString = (input: unknown): string => {
             <div className="flex-1 overflow-y-auto px-6 py-4 no-scrollbar">
               <div className="flex-1 max-w-4xl mx-auto space-y-4">
                 {messages.map((message, index) => (
-                  <ChatMessage
+                  <div key={message.messageId}>
+                    <ChatMessage
                     key={message.messageId}
                     id={message.messageId}
                     content={message.content}
@@ -142,6 +143,7 @@ const getValidISOString = (input: unknown): string => {
                     hasLiked={hasLiked}
                     isSummaryPresent={Boolean(message.summary?.trim())}
                   />
+                  </div>
                 ))}
                 
                 {isLoading && (

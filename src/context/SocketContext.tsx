@@ -49,8 +49,6 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { data: threadMessages } = useMessages(threadId);
 
-  console.log("threadMessages from react query", threadMessages);
-
   useEffect(() => {
     if (!socket) return;
 
@@ -288,7 +286,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
   };
 
   useEffect(() => {
-    const transformedMessages = threadMessages?.map((msg: Message) => ({
+      const transformedMessages = threadMessages?.map((msg: Message) => ({
       messageId: msg.messageId,
       content: msg.messageContent,
       role: msg.by === "ai" ? "assistant" : "user",

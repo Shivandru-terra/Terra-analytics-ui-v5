@@ -4,7 +4,6 @@ const LoginPage = () => {
   const handleGoogleLogin = () => {
     const url = generalFunctions.createUrl("login");
    window.location.href = url;
-  //  window.location.href = "https://fastapi-service-427230556695.asia-south2.run.app/login";
   };
 
   return (
