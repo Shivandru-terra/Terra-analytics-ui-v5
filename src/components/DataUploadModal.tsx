@@ -22,12 +22,12 @@ const DataUploadModal = ({ isOpen, onClose }) => {
   const [option, setOption] = useState<string>("");
   const [workSheet, setWorkSheet] = useState("");
   const { data: docsList } = useGetAllDocs(isOpen);
-  const { data: workSheets } = useGetAllWorkSheets(isOpen);
+  const { platform } = useSocket();
+  const { data: workSheets } = useGetAllWorkSheets(isOpen, platform);
   const { data: docData } = useGetDocData(option);
   const [content, setContent] = useState("");
   const { mutate: updateDoc } = useUpdateDocData(option);
-  const { mutate: addCsvData, isPending } = useAddCsvDataToFirestore()
-  const { platform } = useSocket();
+  const { mutate: addCsvData, isPending } = useAddCsvDataToFirestore(platform)
   const [filteredDocs, setFilteredDocs] = useState<string[]>([]);
 
   // workBookData is the raw array from your backend

@@ -1,9 +1,9 @@
 import { generalFunctions } from "@/lib/generalFuntion";
 
 class WorkBookServices {
-    async getAllWorkSheets(){
+    async getAllWorkSheets(platform: string){
         try {
-            const url = generalFunctions.createUrl("workbooks/");
+            const url = generalFunctions.createUrl(`workbooks/${platform}`);
             const res = await fetch(url);
             const data = await res.json();
             return data;
@@ -12,9 +12,9 @@ class WorkBookServices {
         }
     }
 
-    async getSheetData(sheet_name: string){
+    async getSheetData(sheet_name: string, platform: string){
         try {
-            const url = generalFunctions.createUrl(`workbooks/data/${sheet_name}`);
+            const url = generalFunctions.createUrl(`workbooks/data/${platform}/${sheet_name}`);
             const res = await fetch(url);
             const data = await res.json();
             return data;

@@ -1,9 +1,9 @@
 import { generalFunctions } from "@/lib/generalFuntion";
 
 class CsvServices {
-    async addDataFromCsvToFireStore(doc_id: string, sheetName: string): Promise<void> {
+    async addDataFromCsvToFireStore(doc_id: string, sheetName: string, platform: string): Promise<void> {
         try {
-            const url = generalFunctions.createUrl("csv/addData");
+            const url = generalFunctions.createUrl(`csv/addData/${platform}`);
             const res = await fetch(url, {
                 method: "POST",
                 headers: {
