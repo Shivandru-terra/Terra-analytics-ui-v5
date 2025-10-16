@@ -27,7 +27,7 @@ export function AnalyticsChat() {
   const isLoading = status.status === 'processing';
 
 
-  const handleNewAnalysis = async () => {
+  const handleNewAnalysis = async (platform: string = "terra") => {
     const newThreadId = `t-${uuidv4()}`;
     navigate(`/dashboard/${newThreadId}`);
     const payload = {
@@ -48,7 +48,7 @@ export function AnalyticsChat() {
 
   useEffect(() => {
     if (!activeThreadId) {
-      handleNewAnalysis();
+      handleNewAnalysis(platform);
     }
   }, [activeThreadId]);
 
@@ -65,13 +65,8 @@ export function AnalyticsChat() {
     }
   }, [messages, isLoading]);
 
-  console.log("status testing", status);
-
 
   const safeStage = status?.step || status?.status || "" ;
-
-  console.log("safe stage", safeStage);
-
 
   const handleThreadSelect = (threadId: string) => {
     setActiveThreadId(threadId);
@@ -102,8 +97,6 @@ const getValidISOString = (input: unknown): string => {
     editMessage(messageId, newContent, "True" , isoTime);
     toast.success("Editing...!");
   };
-
-  console.log("messages from analytics chat", messages);
 
   return (
     <div className="h-screen bg-gradient-bg flex">

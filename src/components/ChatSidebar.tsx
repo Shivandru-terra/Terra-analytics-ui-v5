@@ -20,7 +20,7 @@ import { generalFunctions } from "@/lib/generalFuntion";
 interface ChatSidebarProps {
   activeThreadId: string | null;
   onThreadSelect: (threadId: string) => void;
-  onNewAnalysis: () => void;
+  onNewAnalysis: (platform: string) => void;
 }
 
 export function ChatSidebar({
@@ -171,7 +171,7 @@ useEffect(() => {
         </p>
 
         <Button
-          onClick={onNewAnalysis}
+          onClick={() => onNewAnalysis(platform)}
           className="w-full bg-gradient-primary hover:shadow-glow text-white mb-4 cyber-glow transition-all duration-smooth"
         >
           <Plus className="w-4 h-4 mr-2" />

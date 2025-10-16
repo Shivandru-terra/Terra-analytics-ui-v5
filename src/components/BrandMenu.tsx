@@ -9,8 +9,7 @@ import {
 import { useSocket } from "@/context/SocketContext";
 import { generalFunctions } from "@/lib/generalFuntion";
 
-export function BrandMenu({ onNewAnalysis }: { onNewAnalysis: () => void }) {
-  console.log("🔄 Component rendering...");
+export function BrandMenu({ onNewAnalysis }: { onNewAnalysis: (platform: string) => void }) {
   const { setPlatform } = useSocket();
   async function handlePlatform(platform: string){
     try {
@@ -25,7 +24,7 @@ export function BrandMenu({ onNewAnalysis }: { onNewAnalysis: () => void }) {
 
   async function handleMenuClick(platform: string){
     try {
-      onNewAnalysis();
+      onNewAnalysis(platform);
       setPlatform(platform);
       await handlePlatform(platform);
     } catch (error) {
