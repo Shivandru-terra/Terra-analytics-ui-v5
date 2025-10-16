@@ -33,7 +33,6 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     setThreadId(newThreadId);
     console.log("🔄 Updated threadId:", newThreadId);
   }, [location.pathname]);
-  const queryClient = useQueryClient();
   const [messages, setMessages] = useState<Message[]>([]);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [status, setStatus] = useState<ServerStatus>({
@@ -43,7 +42,8 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     null
   );
   const [isFirstInteraction, setIsFirstInteraction] = useState(false);
-  const [platform, setPlatform] = useState<string | null>("terra");
+  const [platform, setPlatform] = useState<string | null>(()=>{
+    return generalFunctions.getPlatform()});
   const userId = generalFunctions.getUserId();
   const socket = useSocketHandle(userId, threadId, platform, SOCKET_URL);
   const [isLoading, setIsLoading] = useState(false);
@@ -297,6 +297,11 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     }));
     setMessages(transformedMessages || []);
   }, [threadId, threadMessages]);
+
+  useEffect(() => {
+  const storedPlatform = localStorage.getItem("platform") || "";
+  setPlatform(storedPlatform);
+}, []);
 
   const editMessage = (
     messageId: string,

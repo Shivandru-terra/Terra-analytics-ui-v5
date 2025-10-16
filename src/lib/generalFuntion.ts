@@ -19,6 +19,14 @@ class GeneralFunctions {
     getUserName () : string | "" {
         return localStorage.getItem("name") || "User";
     }
+
+    getPlatform(): string | "" {
+        return localStorage.getItem("platform") || "";
+    }
+
+    setPlatform(platform: string) {
+        localStorage.setItem("platform", platform);
+    }
 }
 
 export const generalFunctions = new GeneralFunctions();

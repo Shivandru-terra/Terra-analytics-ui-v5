@@ -1,3 +1,4 @@
+import { generalFunctions } from "@/lib/generalFuntion";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -31,6 +32,7 @@ const LoginSuccess = () => {
       localStorage.setItem("email", email!);
       localStorage.setItem("name", name!);
       localStorage.setItem("userId", userId);
+      generalFunctions.setPlatform("terra");
       // navigate("/dashboard");
       navigate(`/dashboard/${threadIdFromUrl}`);
     }

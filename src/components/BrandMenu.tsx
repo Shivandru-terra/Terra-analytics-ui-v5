@@ -24,6 +24,7 @@ export function BrandMenu({ onNewAnalysis }: { onNewAnalysis: (platform: string)
 
   async function handleMenuClick(platform: string){
     try {
+      generalFunctions.setPlatform(platform);
       onNewAnalysis(platform);
       setPlatform(platform);
       await handlePlatform(platform);
