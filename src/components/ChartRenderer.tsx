@@ -1,9 +1,10 @@
 // ChartRenderer.tsx
 import React from "react";
 import ReactECharts from "echarts-for-react";
+import type { EChartsOption } from "echarts";
 
 interface ChartRendererProps {
-  config: any;
+  config: EChartsOption;
 }
 
 const ChartRenderer: React.FC<ChartRendererProps> = ({ config }) => {

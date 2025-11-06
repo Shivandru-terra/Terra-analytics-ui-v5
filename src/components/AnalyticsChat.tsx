@@ -102,7 +102,7 @@ const getValidISOString = (input: unknown): string => {
     <div className="h-screen bg-gradient-bg flex">
       {/* Header */}
       <div className="fixed top-0 right-0 z-50 p-4">
-        {/* {(userId === "u-923f0553-2728-4545-9f95-80dd29c74537" || userId === "u-2b334b0d-a6ba-4730-949b-f29f201987a2" || userId === "u-7ca18dfc-85bf-4653-a19f-a6555c0e04f5") && <LearningQueue />} */}
+        {(userId === "u-923f0553-2728-4545-9f95-80dd29c74537" || userId === "u-eb8ec0a9-4872-4b99-ad53-b4b108409507" || userId === "u-7ca18dfc-85bf-4653-a19f-a6555c0e04f5") && <LearningQueue />}
         <ThemeToggle />
       </div>
       

@@ -20,11 +20,11 @@ class GeneralFunctions {
         return localStorage.getItem("name") || "User";
     }
 
-    getPlatform(): string | "" {
-        return localStorage.getItem("platform") || "";
+    getPlatform(): "ai_games" | "terra" {
+        return localStorage.getItem("platform") as "ai_games" | "terra";
     }
 
-    setPlatform(platform: string) {
+    setPlatform(platform: "ai_games" | "terra") {
         localStorage.setItem("platform", platform);
     }
 }

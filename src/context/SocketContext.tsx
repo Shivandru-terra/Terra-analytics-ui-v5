@@ -42,7 +42,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     null
   );
   const [isFirstInteraction, setIsFirstInteraction] = useState(false);
-  const [platform, setPlatform] = useState<string | null>(()=>{
+  const [platform, setPlatform] = useState<"ai_games" | "terra" | null>(()=>{
     return generalFunctions.getPlatform()});
   const userId = generalFunctions.getUserId();
   const socket = useSocketHandle(userId, threadId, platform, SOCKET_URL);
@@ -299,7 +299,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
   }, [threadId, threadMessages]);
 
   useEffect(() => {
-  const storedPlatform = localStorage.getItem("platform") || "";
+  const storedPlatform = localStorage.getItem("platform") as "ai_games" | "terra";
   setPlatform(storedPlatform);
 }, []);
 
@@ -313,14 +313,14 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     console.log("messageId on edit", messageId);
     const index = messages.findIndex((msg) => msg.messageId === messageId);
     if (index === -1) return;
-    const messagesToDelete = messages.slice(index + 1); // after the edited message
-    const messageIdsToDelete = messagesToDelete.map((msg) => msg.messageId);
-    const url = generalFunctions.createUrl(`messages/delete-batch`);
-    fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messageIds: messageIdsToDelete }),
-    });
+    // const messagesToDelete = messages.slice(index + 1); // after the edited message
+    // const messageIdsToDelete = messagesToDelete.map((msg) => msg.messageId);
+    // const url = generalFunctions.createUrl(`messages/delete-batch`);
+    // fetch(url, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ messageIds: messageIdsToDelete }),
+    // });
     if (socket && newContent && jumpTo && threadId) {
       const messageIndex = messages.findIndex(
         (msg) => msg.messageId === messageId

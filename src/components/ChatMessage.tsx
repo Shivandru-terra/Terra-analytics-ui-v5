@@ -69,8 +69,6 @@ export function ChatMessage({
     setIsEditing(false);
   };
 
-  console.log("isSummaryPresent", isSummaryPresent)
-
   const handleCancelEdit = () => {
     setEditContent(content);
     setIsEditing(false);
@@ -98,8 +96,6 @@ export function ChatMessage({
     }
     conversation.push({ role: "human", content: message.content });
 
-    const payload = { conversation, timestamp: message.timestamp };
-
     if (socket) {
       let eventName: string;
       let payload: PayloadType;
@@ -113,7 +109,17 @@ export function ChatMessage({
           threadId: threadId,
           platform
         };
-      } else if (message.node === "ask_for_jql_verification") {
+      } else if(message.node === "ask_for_sql_verification" && platform === "ai_games") {
+        eventName = "sql_learning";
+        payload = {
+          conversation,
+          timestamp: message.timestamp,
+          messageId: message.messageId,
+          threadId: threadId,
+          platform
+        };
+      }
+       else if (message.node === "ask_for_jql_verification" && platform === "terra") {
         eventName = "jql_learning";
         payload = {
           conversation,

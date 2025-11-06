@@ -22,7 +22,7 @@ export function BrandMenu({ onNewAnalysis }: { onNewAnalysis: (platform: string)
     }
   }
 
-  async function handleMenuClick(platform: string){
+  async function handleMenuClick(platform: "ai_games" | "terra") {
     try {
       generalFunctions.setPlatform(platform);
       onNewAnalysis(platform);
