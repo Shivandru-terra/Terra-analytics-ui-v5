@@ -31,12 +31,9 @@ type LearningItem = {
   messageId: string;
   createdAt: string;
   platform: "terra" | "ai_games";
-  status: string;
   threadId: string;
-  conversation?: ConversationType[];
-  eventType: string;
-  timestamp: string;
-  feedback?: string;
+  status: string;
+  payload: PayloadType
 };
 
 export function LearningQueue() {
@@ -46,7 +43,7 @@ export function LearningQueue() {
     sql_learning: [],
     python_learning: [],
   });
-  const { socket } = useSocket();
+  const { socket, platform } = useSocket();
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -65,8 +62,8 @@ export function LearningQueue() {
       };
 
       for (const item of data) {
-        if (grouped[item.eventType as keyof typeof grouped]) {
-          grouped[item.eventType as keyof typeof grouped].push(item);
+        if (grouped[item.payload.eventType as keyof typeof grouped]) {
+          grouped[item.payload.eventType as keyof typeof grouped].push(item);
         }
       }
 
@@ -104,26 +101,27 @@ export function LearningQueue() {
     if (!socket) return;
 
     // Base payload with common properties
-    const payload: any = {
-      timestamp: item.timestamp,
+    const payload: {timestamp: string, messageId: string, threadId: string, isAdminApproved: boolean, learning_id: string, feedback?: string, conversation?: ConversationType[], platform: string} = {
+      timestamp: item.payload.timestamp,
       messageId: item.messageId,
       threadId: item.threadId,
       isAdminApproved,
       learning_id: item.learningId,
+      platform
     };
 
     // Add event-specific properties
-    if (item.eventType === "python_learning") {
-      payload.feedback = item.feedback;
+    if (item.payload.eventType === "python_learning") {
+      payload.feedback = item.payload.feedback;
     } else {
-      payload.conversation = item.conversation;
+      payload.conversation = item.payload.conversation;
     }
 
     console.log(
-      `[Socket Event] Emitting ${item.eventType} (Admin Approval):`,
+      `[Socket Event] Emitting ${item.payload.eventType} (Admin Approval):`,
       payload
     );
-    socket.emit(item.eventType, payload);
+    socket.emit(item.payload.eventType, payload);
   }
 
   async function handleDeny(item: LearningItem) {
@@ -188,25 +186,25 @@ export function LearningQueue() {
                         className="p-3 bg-muted rounded-md border text-sm space-y-2"
                       >
                         <div className="font-semibold">
-                          {item?.feedback ??
-                            item?.conversation?.[0]?.content ??
+                          {item?.payload?.feedback ??
+                            item?.payload?.conversation?.[0]?.content ??
                             "No Content"}
                         </div>
 
                         <div className="text-muted-foreground text-xs">
                           <span>Status: {item.status}</span> |{" "}
-                          <span>Time: {item?.timestamp}</span>
+                          <span>Time: {item?.payload?.timestamp}</span>
                         </div>
-                        {item?.conversation && item?.conversation.length > 1 && (
+                        {item?.payload?.conversation && item?.payload?.conversation.length > 1 && (
                           <Accordion type="single" collapsible className="pt-2">
                             <AccordionItem value="conversation">
                               <AccordionTrigger className="text-xs">
                                 View Full Conversation (
-                                {item?.conversation.length} messages)
+                                {item?.payload?.conversation.length} messages)
                               </AccordionTrigger>
                               <AccordionContent>
                                 <ul className="space-y-2">
-                                  {item.conversation.map((msg, idx) => (
+                                  {item.payload.conversation.map((msg, idx) => (
                                     <li key={idx}>
                                       <span className="font-medium capitalize">
                                         {msg.role}:
