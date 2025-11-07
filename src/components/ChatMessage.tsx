@@ -74,6 +74,7 @@ export function ChatMessage({
     setIsEditing(false);
   };
 
+  console.log("message nodes test", message);
 
   const handleRemember = () => {
     if (remembering || learningStatus !== 'idle') return;
@@ -100,7 +101,7 @@ export function ChatMessage({
       let eventName: string;
       let payload: PayloadType;
 
-      if (message.node === "ask_python_result_verification") {
+      if (message.node.includes("ask_python_result_verification") || message.node.includes("process_python_result_feedback")) {
         eventName = "python_learning";
         payload = {
           feedback: message.content,
@@ -109,7 +110,7 @@ export function ChatMessage({
           threadId: threadId,
           platform
         };
-      } else if(message.node === "ask_for_sql_verification" && platform === "ai_games") {
+      } else if((message.node.includes("ask_for_sql_verification") || message.node.includes("process_sql_verification")) && platform === "ai_games") {
         eventName = "sql_learning";
         payload = {
           conversation,
@@ -119,7 +120,7 @@ export function ChatMessage({
           platform
         };
       }
-       else if (message.node === "ask_for_jql_verification" && platform === "terra") {
+       else if ((message.node.includes("ask_for_jql_verification") || message.node.includes("process_jql_verification")) && platform === "terra") {
         eventName = "jql_learning";
         payload = {
           conversation,
