@@ -25,9 +25,9 @@ const LoginSuccess = () => {
 
     console.log("✅ Extracted from URL:", { token, email, name });
 
-    if (!email?.endsWith("@letsterra.com")) {
-      navigate("/unauthorized");
-    } else {
+    // if (!email?.endsWith("@letsterra.com")) {
+    //   navigate("/unauthorized");
+    // } else {
       localStorage.setItem("token", token!);
       localStorage.setItem("email", email!);
       localStorage.setItem("name", name!);
@@ -35,7 +35,7 @@ const LoginSuccess = () => {
       generalFunctions.setPlatform("terra");
       // navigate("/dashboard");
       navigate(`/dashboard/${threadIdFromUrl}`);
-    }
+    // }
   }, [location.search, navigate]);
 
   return <p>Logging in...</p>;
